@@ -133,10 +133,45 @@ async def process_and_send_file(update: Update, file_path: str, file_type: str, 
         if os.path.exists(processed_file_path):
             os.remove(processed_file_path)
 
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    document_limit = FILECONFIG.get('document')
+    image_limit = FILECONFIG.get('image')
+    video_limit = FILECONFIG.get('video')
+    music_limit = FILECONFIG.get('music')
+
+    help_text = f"""
+🤖 MetadataEraserBot Help 🤖
+
+This bot helps you remove metadata from your files. Here's how to use it:
+
+1. Send any supported file type (document, image, video, audio) to the bot.
+2. The bot will process the file and remove its metadata.
+3. You'll receive the processed file back, free of metadata.
+
+Supported file types and size limits:
+• Documents: Up to {document_limit} MB
+• Images (JPEG, PNG): Up to {image_limit} MB
+• Videos (MP4): Up to {video_limit} MB
+• Audio (MP3): Up to {music_limit} MB
+
+🎵 To send music files:
+   - You can add a caption in the format "Title, Artist" to set these metadata fields.
+   - Example: "Title, Artist"
+   - If you don't add a caption, all metadata will be removed.
+
+
+Commands:
+/start - Start the bot
+/help - Show this help message
+
+    """
+    await update.message.reply_text(help_text)
+
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
     application.add_handler(MessageHandler(filters.ALL, download_file))
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
